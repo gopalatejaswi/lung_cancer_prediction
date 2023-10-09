@@ -1,0 +1,71 @@
+%config Completer.use_jedi = False
+import numpy as np 
+import pandas as pd 
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+from PIL import Image
+import seaborn as sns
+import cv2
+import random
+import os
+import imageio
+import plotly.graph_objects as go
+import plotly.express as px
+import plotly.figure_factory as ff
+from plotly.subplots import make_subplots
+from collections import Counter
+
+directory = r'../input/iqothnccd-lung-cancer-dataset/The IQ-OTHNCCD lung cancer dataset'
+categories = ['Bengin cases', 'Malignant cases', 'Normal cases']
+
+size_data = {}
+for i in categories:
+    path = os.path.join(directory, i)
+    class_num = categories.index(i)
+    temp_dict = {}
+    for file in os.listdir(path):
+        filepath = os.path.join(path, file)
+        height, width, channels = imageio.imread(filepath).shape
+        if str(height) + ' x ' + str(width) in temp_dict:
+            temp_dict[str(height) + ' x ' + str(width)] += 1 
+        else:
+            temp_dict[str(height) + ' x ' + str(width)] = 1
+    
+    size_data[i] = temp_dict
+        
+size_data
+
+for i in categories:
+    path = os.path.join(directory, i)
+    class_num = categories.index(i)
+    for file in os.listdir(path):
+        filepath = os.path.join(path, file)
+        print(i)
+        img = cv2.imread(filepath, 0)
+        plt.imshow(img)
+        plt.show()
+        break
+img_size = 256
+for i in categories:
+    cnt, samples = 0, 3
+    fig, ax = plt.subplots(samples, 3, figsize=(15, 15))
+    fig.suptitle(i)
+    
+    path = os.path.join(directory, i)
+    class_num = categories.index(i)
+    for curr_cnt, file in enumerate(os.listdir(path)):
+        filepath = os.path.join(path, file)
+        img = cv2.imread(filepath, 0)
+        
+        img0 = cv2.resize(img, (img_size, img_size))
+        
+        img1 = cv2.GaussianBlur(img0, (5, 5), 0)
+        
+        ax[cnt, 0].imshow(img)
+        ax[cnt, 1].imshow(img0)
+        ax[cnt, 2].imshow(img1)
+        cnt += 1
+        if cnt == samples:
+            break
+        
+plt.show()
